@@ -1,36 +1,29 @@
 @extends('backend.layouts.app')
 
-@section('title')
-{{ $module_action }} {{ $module_title }} | {{ app_name() }}
-@stop
+@section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item"><a href='{!!route("backend.$module_name.index")!!}'><i class="{{ $module_icon }}"></i> {{ $module_title }}</a></li>
-<li class="breadcrumb-item active"> {{ $module_action }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item route='{{route("backend.$module_name.index")}}' icon='{{ $module_icon }}'>
+        {{ __($module_title) }}
+    </x-backend-breadcrumb-item>
+    <x-backend-breadcrumb-item type="active">{{ __($module_action) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
 <div class="card">
     <div class="card-body">
-        <div class="row">
-            <div class="col-8">
-                <h4 class="card-title mb-0">
-                    <i class="{{ $module_icon }}"></i> {{ $module_title }} <small class="text-muted">{{ $module_action }}</small>
-                </h4>
-                <div class="small text-muted">
-                    {{ ucwords($module_name) }} Management Dashboard
-                </div>
-            </div>
-            <!--/.col-->
-            <div class="col-4">
-                <div class="float-right">
-                    <a href="{{ route("backend.$module_name.index") }}" class="btn btn-secondary mt-1 btn-sm" data-toggle="tooltip" title="{{ ucwords($module_name) }} List"><i class="fas fa-list"></i> List</a>
-                </div>
-            </div>
-            <!--/.col-->
-        </div>
-        <!--/.row-->
+        <x-backend.section-header>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
+
+            <x-slot name="subtitle">
+                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+            </x-slot>
+            <x-slot name="toolbar">
+                <a href="{{ route("backend.$module_name.index") }}" class="btn btn-secondary mt-1 btn-sm" data-toggle="tooltip" title="{{ __(ucwords($module_name)) }} List"><i class="fas fa-list"></i> List</a>
+            </x-slot>
+        </x-backend.section-header>
 
         <hr>
 
@@ -78,13 +71,13 @@
     <div class="card-footer">
         <div class="row">
             <div class="col">
-                <small class="float-right text-muted">
+                <small class="float-end text-muted">
                     Updated: {{$$module_name_singular->updated_at->diffForHumans()}},
-                    Created at: {{$$module_name_singular->created_at->toCookieString()}}
+                    Created at: {{$$module_name_singular->created_at->isoFormat('LLLL')}}
                 </small>
             </div>
         </div>
     </div>
 </div>
 
-@stop
+@endsection

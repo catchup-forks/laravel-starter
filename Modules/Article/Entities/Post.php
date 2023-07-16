@@ -4,24 +4,31 @@ namespace Modules\Article\Entities;
 
 use App\Models\BaseModel;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Modules\Article\Entities\Presenters\PostPresenter;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Feed\Feedable;
-use Spatie\Feed\FeedItem;
 
-class Post extends BaseModel implements Feedable
+class Post extends BaseModel
 {
+    use HasFactory;
     use LogsActivity;
     use SoftDeletes;
     use PostPresenter;
     use Notifiable;
+
     protected $table = 'posts';
 
-    protected static $logName = 'posts';
-    protected static $logOnlyDirty = true;
-    protected static $logAttributes = ['name', 'intro', 'content', 'type', 'category_id', 'category_name', 'is_featured', 'meta_title', 'meta_keywords', 'meta_description', 'published_at', 'moderated_at', 'moderated_by', 'status', 'created_by_alias'];
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logUnguarded()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName($this->table);
+    }
 
     public function category()
     {
@@ -30,15 +37,15 @@ class Post extends BaseModel implements Feedable
 
     public function tags()
     {
-        return $this->belongsToMany('Modules\Article\Entities\Tag');
+        return $this->morphToMany('Modules\Tag\Entities\Tag', 'taggable');
     }
 
     /**
-     * All Published Comments.
+     * Get all of the post's comments.
      */
     public function comments()
     {
-        return $this->hasMany('Modules\Article\Entities\Comment')->where('status', '=', 1);
+        return $this->morphMany('Modules\Comment\Entities\Comment', 'commentable')->where('status', '=', 1);
     }
 
     /**
@@ -96,7 +103,7 @@ class Post extends BaseModel implements Feedable
         $this->attributes['meta_description'] = $value;
 
         if (empty($value)) {
-            $this->attributes['meta_description'] = config('settings.meta_description');
+            $this->attributes['meta_description'] = setting('meta_description');
         }
     }
 
@@ -138,13 +145,12 @@ class Post extends BaseModel implements Feedable
      * Get the list of Published Articles.
      *
      * @param [type] $query [description]
-     *
      * @return [type] [description]
      */
     public function scopePublished($query)
     {
         return $query->where('status', '=', '1')
-                        ->where('published_at', '<=', Carbon::now());
+            ->where('published_at', '<=', Carbon::now());
     }
 
     public function scopePublishedAndScheduled($query)
@@ -155,39 +161,30 @@ class Post extends BaseModel implements Feedable
     public function scopeFeatured($query)
     {
         return $query->where('is_featured', '=', 'Yes')
-                        ->where('status', '=', '1')
-                        ->where('published_at', '<=', Carbon::now());
+            ->where('status', '=', '1')
+            ->where('published_at', '<=', Carbon::now());
     }
 
     /**
      * Get the list of Recently Published Articles.
      *
      * @param [type] $query [description]
-     *
      * @return [type] [description]
      */
     public function scopeRecentlyPublished($query)
     {
         return $query->where('status', '=', '1')
-                        ->whereDate('published_at', '<=', Carbon::today()->toDateString())
-                        ->orderBy('published_at', 'desc');
+            ->whereDate('published_at', '<=', Carbon::today()->toDateString())
+            ->orderBy('published_at', 'desc');
     }
 
-    public function toFeedItem()
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
     {
-        $author = ($this->created_by_alias != '') ? $this->created_by_alias : $this->created_by_name;
-
-        return FeedItem::create()
-                        ->id(encode_id($this->id))
-                        ->title($this->name)
-                        ->summary($this->intro)
-                        ->updated($this->updated_at)
-                        ->link(route('frontend.posts.show', encode_id($this->id)))
-                        ->author($author);
-    }
-
-    public static function getFeedItems()
-    {
-        return self::latest()->published()->take('5')->get();
+        return \Modules\Article\Database\Factories\PostFactory::new();
     }
 }

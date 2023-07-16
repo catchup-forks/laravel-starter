@@ -1,47 +1,43 @@
 @extends ('backend.layouts.app')
 
-@section('title')
-{{ $module_action }} {{ $module_title }} | {{ app_name() }}
-@stop
+@section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item active"><i class="{{ $module_icon }}"></i> {{ $module_title }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item type="active" icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
 <div class="card">
     <div class="card-body">
-        <div class="row">
-            <div class="col">
-                <h4 class="card-title mb-0">
-                    <i class="{{ $module_icon }}"></i> {{ $module_title }} <small class="text-muted">Data Table {{ $module_action }}</small>
-                </h4>
-                <div class="small text-muted">
-                    {{ __('labels.backend.users.index.sub-title') }}
-                </div>
-            </div>
 
-            <div class="col-4">
-                <div class="float-right">
-                    <a href="{{ route("backend.$module_name.create") }}" class="btn btn-success m-1 btn-sm" data-toggle="tooltip" title="Create New"><i class="fas fa-plus-circle"></i> Create</a>
-                    <div class="btn-group" role="group" aria-label="Toolbar button groups">
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupToolbar" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-cog"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupToolbar">
-                                <a class="dropdown-item" href="{{ route("backend.$module_name.trashed") }}">
-                                    <i class="fas fa-eye-slash"></i> View trash
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+        <x-backend.section-header>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
+
+            <x-slot name="subtitle">
+                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+            </x-slot>
+            <x-slot name="toolbar">
+                <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href='{{ route("backend.$module_name.trashed") }}'>
+                                <i class="fas fa-eye-slash"></i> View trash
+                            </a>
+                        </li>
+                        <!-- <li>
+                            <hr class="dropdown-divider">
+                        </li> -->
+                    </ul>
                 </div>
-            </div>
-            <!--/.col-->
-        </div>
-        <!--/.row-->
+            </x-slot>
+        </x-backend.section-header>
 
         <div class="row mt-4">
             <div class="col">
@@ -54,7 +50,7 @@
                                 <th>{{ __('labels.backend.users.fields.email') }}</th>
                                 <th>{{ __('labels.backend.users.fields.status') }}</th>
                                 <th>{{ __('labels.backend.users.fields.roles') }}</th>
-                                <th class="text-right">{{ __('labels.backend.action') }}</th>
+                                <th class="text-end">{{ __('labels.backend.action') }}</th>
                             </tr>
                         </thead>
                     </table>
@@ -70,14 +66,14 @@
                 </div>
             </div>
             <div class="col-5">
-                <div class="float-right">
+                <div class="float-end">
 
                 </div>
             </div>
         </div>
     </div>
 </div>
-@stop
+@endsection
 
 @push ('after-styles')
 <!-- DataTables Core and Extensions -->
@@ -87,25 +83,42 @@
 
 @push ('after-scripts')
 <!-- DataTables Core and Extensions -->
-<script type="text/javascript" src="{{ asset('vendor/datatable/datatables.min.js') }}"></script>
+<script type="module" src="{{ asset('vendor/datatable/datatables.min.js') }}"></script>
 
-<script type="text/javascript">
-
+<script type="module">
     $('#datatable').DataTable({
         processing: true,
         serverSide: true,
         autoWidth: true,
         responsive: true,
         ajax: '{{ route("backend.$module_name.index_data") }}',
-        columns: [
-            {data: 'id', name: 'id'},
-            {data: 'name', name: 'name'},
-            {data: 'email', name: 'email'},
-            {data: 'status', name: 'status'},
-            {data: 'user_roles', name: 'user_roles'},
-            {data: 'action', name: 'action', orderable: false, searchable: false}
+        columns: [{
+                data: 'id',
+                name: 'id'
+            },
+            {
+                data: 'name',
+                name: 'name'
+            },
+            {
+                data: 'email',
+                name: 'email'
+            },
+            {
+                data: 'status',
+                name: 'status'
+            },
+            {
+                data: 'user_roles',
+                name: 'user_roles'
+            },
+            {
+                data: 'action',
+                name: 'action',
+                orderable: false,
+                searchable: false
+            }
         ]
     });
-
 </script>
 @endpush

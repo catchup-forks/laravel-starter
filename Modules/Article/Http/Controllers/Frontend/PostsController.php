@@ -8,6 +8,16 @@ use Modules\Article\Events\PostViewed;
 
 class PostsController extends Controller
 {
+    public $module_title;
+
+    public $module_name;
+
+    public $module_path;
+
+    public $module_icon;
+
+    public $module_model;
+
     public function __construct()
     {
         // Page Title
@@ -53,8 +63,7 @@ class PostsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function show($hashid)
@@ -72,7 +81,7 @@ class PostsController extends Controller
 
         $meta_page_type = 'article';
 
-        $$module_name_singular = $module_model::with(['category', 'tags', 'comments'])->findOrFail($id);
+        $$module_name_singular = $module_model::findOrFail($id);
 
         event(new PostViewed($$module_name_singular));
 

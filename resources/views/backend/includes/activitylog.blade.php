@@ -1,8 +1,8 @@
 <div class="accordion" id="activityLogBlock">
     <div class="card card-accent-primary">
         <div class="card-header" id="activityLog">
-            <button class="btn btn-outline-primary collapsed" type="button" data-toggle="collapse" data-target="#activityLogSection" aria-expanded="false" aria-controls="activityLogSection">
-                Show Activity Log
+            <button class="btn btn-outline-primary collapsed" type="button" data-coreui-toggle="collapse" data-coreui-target="#activityLogSection" aria-expanded="false" aria-controls="activityLogSection">
+                @lang('Activity Log')
             </button>
         </div>
         <div id="activityLogSection" class="collapse" aria-labelledby="activityLog" data-parent="#activityLogBlock">
@@ -10,7 +10,7 @@
                 <div class="row">
                     <div class="col">
                         <div class="text-center">
-                            <h4>Activity Log</h4>
+                            <h4>@lang('Activity Log')</h4>
                         </div>
 
                         <div class="table-responsive">
@@ -18,19 +18,19 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">
-                                            Current
+                                            @lang('Current')
                                         </th>
                                         <th class="text-center">
-                                            Old
+                                            @lang('Old')
                                         </th>
                                         <th>
-                                            At
+                                            @lang('At')
                                         </th>
                                         <th>
-                                            User
+                                            @lang('User')
                                         </th>
                                         <th>
-                                            Type
+                                            @lang('Type')
                                         </th>
                                     </tr>
                                 </thead>
@@ -41,9 +41,15 @@
                                             <?php $attributes = $activity->properties['attributes']; ?>
                                             <ul class="list-unstyled">
                                                 @foreach ($attributes as $key => $value)
+                                                @if (is_array($value))
                                                 <li>
-                                                    <i class="fas fa-angle-right"></i> <em>{{label_case($key)}}</em>: <mark>{{$value}}</mark>
+                                                    <i class="fas fa-angle-right"></i> <em>{{label_case($key)}}</em>: <mark><?php print_r($value); ?></mark>
                                                 </li>
+                                                @else
+                                                <li>
+                                                    <i class="fas fa-angle-right"></i> <em>{{label_case($key)}}</em>: <mark>{{ $value }}</mark>
+                                                </li>
+                                                @endif
                                                 @endforeach
                                             </ul>
                                         </td>
@@ -52,16 +58,22 @@
                                             <?php $attributes = $activity->properties['old']; ?>
                                             <ul class="list-unstyled">
                                                 @foreach ($attributes as $key => $value)
+                                                @if (is_array($value))
                                                 <li>
-                                                    <i class="fas fa-angle-right"></i> <em>{{label_case($key)}}</em>: <mark>{{$value}}</mark>
+                                                    <i class="fas fa-angle-right"></i> <em>{{label_case($key)}}</em>: <mark><?php print_r($value); ?></mark>
                                                 </li>
+                                                @else
+                                                <li>
+                                                    <i class="fas fa-angle-right"></i> <em>{{label_case($key)}}</em>: <mark>{{ $value }}</mark>
+                                                </li>
+                                                @endif
                                                 @endforeach
                                             </ul>
                                             @endif
                                         </td>
                                         <td>
-                                            Updated: {{$activity->updated_at->diffForHumans()}}<br>
-                                            At: {{$activity->updated_at->toDayDateTimeString()}}
+                                            @lang('Updated'): {{$activity->updated_at->diffForHumans()}}<br>
+                                            @lang('At'): {{$activity->updated_at->isoFormat('llll')}}
                                         </td>
                                         <td>
                                             {{ label_case($activity->causer_id) }}

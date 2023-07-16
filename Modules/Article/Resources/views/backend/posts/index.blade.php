@@ -1,47 +1,47 @@
 @extends('backend.layouts.app')
 
-@section('title')
-{{ $module_action }} {{ $module_title }} | {{ app_name() }}
-@stop
+@section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item active"><i class="{{ $module_icon }}"></i> {{ $module_title }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item type="active" icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
 <div class="card">
     <div class="card-body">
-        <div class="row">
-            <div class="col-8">
-                <h4 class="card-title mb-0">
-                    <i class="{{ $module_icon }}"></i> {{ $module_title }} <small class="text-muted">{{ $module_action }}</small>
-                </h4>
-                <div class="small text-muted">
-                    {{ ucwords($module_name) }} Management Dashboard
+
+        <x-backend.section-header>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
+
+            <x-slot name="subtitle">
+                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+            </x-slot>
+            <x-slot name="toolbar">
+                @can('add_'.$module_name)
+                <x-buttons.create route='{{ route("backend.$module_name.create") }}' title="{{__('Create')}} {{ ucwords(Str::singular($module_name)) }}" />
+                @endcan
+
+                @can('restore_'.$module_name)
+                <div class="btn-group">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-coreui-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href='{{ route("backend.$module_name.trashed") }}'>
+                                <i class="fas fa-eye-slash"></i> View trash
+                            </a>
+                        </li>
+                        <!-- <li>
+                            <hr class="dropdown-divider">
+                        </li> -->
+                    </ul>
                 </div>
-            </div>
-            <!--/.col-->
-            <div class="col-4">
-                <div class="float-right">
-                    <a href="{{ route("backend.$module_name.create") }}" class="btn btn-success m-1 btn-sm" data-toggle="tooltip" title="Create New"><i class="fas fa-plus-circle"></i> Create</a>
-                    <div class="btn-group" role="group" aria-label="Toolbar button groups">
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupToolbar" type="button" class="btn btn-secondary dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-cog"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupToolbar">
-                                <a class="dropdown-item" href="{{ route("backend.$module_name.trashed") }}">
-                                    <i class="fas fa-eye-slash"></i> View trash
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--/.col-->
-        </div>
-        <!--/.row-->
+                @endcan
+            </x-slot>
+        </x-backend.section-header>
 
         <div class="row mt-4">
             <div class="col">
@@ -63,7 +63,7 @@
                             <th>
                                 Image
                             </th>
-                            <th class="text-right">
+                            <th class="text-end">
                                 Action
                             </th>
                         </tr>
@@ -89,7 +89,7 @@
                             <td>
                                 <img src="{{ asset($module_name_singular->featured_image) }}" class="img-fluid img-thumbnail" style="max-width:200px;" alt="{{ $module_name_singular->name }}">
                             </td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <a href='{!!route("backend.$module_name.edit", $module_name_singular)!!}' class='btn btn-sm btn-primary mt-1' data-toggle="tooltip" title="Edit {{ ucwords(Str::singular($module_name)) }}"><i class="fas fa-wrench"></i></a>
                                 <a href='{!!route("backend.$module_name.show", $module_name_singular)!!}' class='btn btn-sm btn-success mt-1' data-toggle="tooltip" title="Show {{ ucwords(Str::singular($module_name)) }}"><i class="fas fa-tv"></i></a>
                             </td>
@@ -108,11 +108,11 @@
                 </div>
             </div>
             <div class="col-5">
-                <div class="float-right">
+                <div class="float-end">
                     {!! $$module_name->render() !!}
                 </div>
             </div>
         </div>
     </div>
 </div>
-@stop
+@endsection

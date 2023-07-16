@@ -1,87 +1,74 @@
-@extends('auth.layout')
+<x-auth-layout>
+    <x-slot name="title">
+        @lang('Register')
+    </x-slot>
 
-@section('content')
+    <x-auth-card>
+        <x-slot name="logo">
+            <a href="/">
+                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+            </a>
+        </x-slot>
 
-<div class="page-header-image" style="background-image:url('{{asset('img/cover-01.jpg')}}')"></div>
+        <!-- Validation Errors -->
+        <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
-<div class="content-center">
-    <div class="container">
+        <!-- Social login -->
+        <x-auth-social-login />
 
-        <div class="col-md-4 content-center">
-            <div class="card card-login card-plain mb-0">
-                <form class="form" method="POST" action="{{ route('register') }}">
-                    @csrf
+        <form method="POST" action="{{ route('register') }}">
+            @csrf
 
-                    <div class="header header-primary text-center">
-                        <h5>
-                            Create an Account
-                        </h5>
+            <!-- First Name -->
+            <div class="mt-4">
+                <x-label for="first_name" :value="__('First Name')" />
 
-                        @include('flash::message')
-                        <!-- Errors block -->
-                        @include('frontend.includes.errors')
-                        <!-- / Errors block -->
-
-                    </div>
-                    <div class="content">
-                        <div class="input-group mb-3 input-lg {{ $errors->has('first_name') ? ' has-danger' : '' }}">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="input-first_name"><i class="fas fa-user"></i></span>
-                            </div>
-                            <input id="name" type="text" class="form-control" name="first_name" value="{{ old('first_name') }}" placeholder="First Name" aria-label="First Name" aria-describedby="input-first_name" required>
-                        </div>
-
-                        <div class="input-group mb-3 input-lg {{ $errors->has('last_name') ? ' has-danger' : '' }}">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="input-last_name"><i class="fas fa-user"></i></span>
-                            </div>
-                            <input id="name" type="text" class="form-control" name="last_name" value="{{ old('last_name') }}" placeholder="Last Name" aria-label="Last Name" aria-describedby="input-last_name" required>
-                        </div>
-
-                        <div class="input-group mb-3 input-lg {{ $errors->has('email') ? ' has-danger' : '' }}">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="input-email"><i class="fas fa-at"></i></span>
-                            </div>
-                            <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" placeholder="Email address" aria-label="Email" aria-describedby="input-email" required>
-                        </div>
-
-                        <div class="input-group mb-3 input-lg {{ $errors->has('password') ? ' has-danger' : '' }}">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="input-password"><i class="fas fa-key"></i></span>
-                            </div>
-                            <input id="password" type="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="input-password" required>
-                        </div>
-
-                        <div class="input-group mb-3 input-lg {{ $errors->has('password_confirmation') ? ' has-danger' : '' }}">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="input-password_confirmation"><i class="fas fa-key"></i></span>
-                            </div>
-                            <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" placeholder="Password (Enter Again)" aria-label="Password" aria-describedby="input-password_confirmation" required>
-                        </div>
-                    </div>
-                    <div class="footer text-center py-0">
-                        <button type="submit" class="btn btn-primary btn-round btn-block">Create Account</button>
-                    </div>
-                    <div class="pull-left">
-                        <h6>
-                            <a href="{{ route('login') }}" class="link">Login to Account</a>
-                        </h6>
-                    </div>
-                    @if (Route::has('password.request'))
-                    <div class="float-right">
-                        <h6>
-                            <a class="link" href="{{ route('password.request') }}">
-                                {{ __('Forgot Your Password?') }}
-                            </a>
-                        </h6>
-                    </div>
-                    @endif
-                </form>
+                <x-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required autofocus />
             </div>
 
-            {{-- @include('auth.social_login_buttons') --}}
-        </div>
-    </div>
-</div>
+            <!-- Last Name -->
+            <div class="mt-4">
+                <x-label for="last_name" :value="__('Last Name')" />
 
-@endsection
+                <x-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" required autofocus />
+            </div>
+
+            <!-- Email Address -->
+            <div class="mt-4">
+                <x-label for="email" :value="__('Email')" />
+
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required />
+            </div>
+
+            <!-- Password -->
+            <div class="mt-4">
+                <x-label for="password" :value="__('Password')" />
+
+                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mt-4">
+                <x-label for="password_confirmation" :value="__('Confirm Password')" />
+
+                <x-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />
+            </div>
+
+            <div class="flex items-center justify-end mt-4">
+                <!-- <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('login') }}">
+                    {{ __('Already registered?') }}
+                </a> -->
+
+                <x-button class="ml-4">
+                    {{ __('Register') }}
+                </x-button>
+            </div>
+        </form>
+
+        <x-slot name="extra">
+            <p class="text-center text-gray-600 mt-4">
+                Already have an account? <a href="{{ route('login') }}" class="underline hover:text-gray-900">Login</a>.
+            </p>
+        </x-slot>
+    </x-auth-card>
+</x-auth-layout>

@@ -1,48 +1,43 @@
 @extends('backend.layouts.app')
 
-@section('title')
-{{ $module_action }} {{ $module_title }} | {{ app_name() }}
-@stop
+@section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item"><a href='{!!route("backend.$module_name.index")!!}'><i class="{{ $module_icon }}"></i> {{ $module_title }}</a></li>
-<li class="breadcrumb-item active"> {{ $module_action }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item route='{{route("backend.$module_name.index")}}' icon='{{ $module_icon }}'>
+        {{ __($module_title) }}
+    </x-backend-breadcrumb-item>
+
+    <x-backend-breadcrumb-item type="active">{{ __($module_action) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
 <div class="card">
     <div class="card-body">
-        <div class="row">
-            <div class="col-8">
-                <h4 class="card-title mb-0">
-                    <i class="{{$module_icon}}"></i> User
-                    <small class="text-muted">Change Password </small>
-                </h4>
-                <div class="small text-muted">
-                    {{ __('labels.backend.users.edit.sub-title') }}
-                </div>
-            </div>
-            <!--/.col-->
-            <div class="col-4">
-                <div class="btn-toolbar float-right" role="toolbar" aria-label="Toolbar with button groups">
-                    <button onclick="window.history.back();"class="btn btn-sm btn-warning ml-1" data-toggle="tooltip" title="Return Back"><i class="fas fa-reply"></i></button>
-                </div>
-            </div>
-            <!--/.col-->
-        </div>
-        <!--/.row-->
+        <x-backend.section-header>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
+
+            <x-slot name="subtitle">
+                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+            </x-slot>
+            <x-slot name="toolbar">
+                <x-backend.buttons.return-back />
+            </x-slot>
+        </x-backend.section-header>
+
         <hr>
-        <div class="row">
+
+        <div class="row mb-3">
             <div class="col">
                 <strong>
-                    Name:
+                    @lang('Name'):
                 </strong>
                 {{ $$module_name_singular->name }}
             </div>
             <div class="col">
                 <strong>
-                    Email:
+                    @lang('Email'):
                 </strong>
                 {{ $$module_name_singular->email }}
             </div>
@@ -51,7 +46,7 @@
             <div class="col">
                 {{ html()->form('PATCH', route('backend.users.changePasswordUpdate', $$module_name_singular->id))->class('form-horizontal')->open() }}
 
-                <div class="form-group row">
+                <div class="form-group row mb-3">
                     {{ html()->label(__('labels.backend.users.fields.password'))->class('col-md-2 form-control-label')->for('password') }}
 
                     <div class="col-md-10">
@@ -60,9 +55,9 @@
                             ->placeholder(__('labels.backend.users.fields.password'))
                             ->required() }}
                     </div>
-                </div><!--form-group-->
+                </div>
 
-                <div class="form-group row">
+                <div class="form-group row mb-3">
                     {{ html()->label(__('labels.backend.users.fields.password_confirmation'))->class('col-md-2 form-control-label')->for('password_confirmation') }}
 
                     <div class="col-md-10">
@@ -71,7 +66,7 @@
                             ->placeholder(__('labels.backend.users.fields.password_confirmation'))
                             ->required() }}
                     </div>
-                </div><!--form-group-->
+                </div>
 
                 <div class="row">
                     <div class="col">
@@ -90,15 +85,12 @@
         </div>
         <!--/.row-->
     </div>
+
     <div class="card-footer">
-        <div class="row">
-            <div class="col">
-                <small class="float-right text-muted">
-                    Updated: {{$user->updated_at->diffForHumans()}},
-                    Created at: {{$user->created_at->toCookieString()}}
-                </small>
-            </div>
-        </div>
+        <x-backend.section-footer>
+            @lang('Updated'): {{$$module_name_singular->updated_at->diffForHumans()}},
+            @lang('Created at'): {{$$module_name_singular->created_at->isoFormat('LLLL')}}
+        </x-backend.section-footer>
     </div>
 </div>
 

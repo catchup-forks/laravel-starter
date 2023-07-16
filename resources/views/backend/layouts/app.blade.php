@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ language_direction() }}">
+
 <head>
-    <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/favicon.png')}}">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <link rel="icon" type="image/png" href="{{asset('img/favicon.png')}}">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
-    <meta name="description" content="{{ setting('meta_description') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{asset('img/favicon.png')}}">
     <meta name="keyword" content="{{ setting('meta_keyword') }}">
+    <meta name="description" content="{{ setting('meta_description') }}">
 
     <!-- Shortcut Icon -->
     <link rel="shortcut icon" href="{{asset('img/favicon.png')}}">
@@ -16,115 +17,66 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title') | {{ config('app.name', 'Laravel Starter') }}</title>
+    <title>@yield('title') | {{ config('app.name') }}</title>
 
-    @stack('before-styles')
+    <script src="{{ asset('vendor/jquery/jquery-3.6.4.min.js') }}"></script>
+
+    @vite(['resources/sass/app-backend.scss', 'resources/js/app-backend.js'])
 
     <link href="https://fonts.googleapis.com/css?family=Ubuntu&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans+Bengali+UI&display=swap" rel="stylesheet" />
-
-    <!-- simple-line-icons -->
-    <link rel="stylesheet" href="{{asset('vendor/simple-line-icons/css/simple-line-icons.css')}}">
-
-    <link rel="stylesheet" href="{{ mix('css/backend.css') }}">
+    <style>
+        body {
+            font-family: Ubuntu, "Noto Sans Bengali UI", Arial, Helvetica, sans-serif
+        }
+    </style>
 
     @stack('after-styles')
+
+    <x-google-analytics />
+
+    @livewireStyles
+
 </head>
 
-<body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show">
+<body>
+    <!-- Sidebar -->
+    @include('backend.includes.sidebar')
+    <!-- /Sidebar -->
 
-    <!-- Header Block -->
-    @include('backend.includes.header')
-    <!-- / Header Block -->
+    <div class="wrapper d-flex flex-column min-vh-100 bg-light">
+        <!-- Header -->
+        @include('backend.includes.header')
+        <!-- /Header -->
 
-    <div class="app-body">
+        <div class="body flex-grow-1 px-3">
+            <div class="container-lg">
 
-        <!-- Sidebar -->
-        @include('backend.includes.sidebar')
-        <!-- /Sidebar -->
+                @include('flash::message')
 
-        <!-- Main content -->
-        <main class="main">
+                <!-- Errors block -->
+                @include('backend.includes.errors')
+                <!-- / Errors block -->
 
-            <!-- Breadcrumb -->
-            <ol class="breadcrumb">
-                @yield('breadcrumbs')
-
-                <!-- Breadcrumb Menu-->
-                <li class="breadcrumb-menu d-md-down-none">
-                    <div class="btn-group" role="group" aria-label="Button group">
-                        {{ date('l, F d, Y') }}&nbsp;<div id="openClockDisplay" class="clock" onload="showTime()"></div>
-                    </div>
-                </li>
-            </ol>
-
-
-            <div class="container-fluid">
-
-                <div class="animated fadeIn">
-
-                    @include('flash::message')
-
-                    <!-- Errors block -->
-                    @include('backend.includes.errors')
-                    <!-- / Errors block -->
-
-                    @yield('content')
-
-                </div>
-                <!-- / animated fadeIn -->
+                <!-- Main content block -->
+                @yield('content')
+                <!-- / Main content block -->
 
             </div>
-            <!-- /.conainer-fluid -->
-        </main>
+        </div>
 
-        <!-- aside block -->
-        @include('backend.includes.aside')
-        <!-- / aside block -->
-
+        <!-- Footer block -->
+        @include('backend.includes.footer')
+        <!-- / Footer block -->
 
     </div>
 
-    <!-- Footer block -->
-    @include('backend.includes.footer')
-    <!-- / Footer block -->
-
     <!-- Scripts -->
-    @stack('before-scripts')
-
-    <script src="{{ mix('js/backend.js') }}"></script>
-
-    <script type="text/javascript">
-
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-
-        $('#flash-overlay-modal').modal();
-
-        showTime();
-    })
-
-    function showTime(){
-        var date = new Date();
-        var hours = date.getHours();
-        var minutes = date.getMinutes();
-        var seconds = date.getSeconds();
-
-        var session = hours >= 12 ? 'pm' : 'am';
-
-        hours = hours % 12;
-        hours = hours ? hours : 12;
-        minutes = minutes < 10 ? '0'+minutes : minutes;
-
-        var time = hours + ":" + minutes + ":" + seconds + " " + session;
-        document.getElementById("openClockDisplay").innerText = time;
-        document.getElementById("openClockDisplay").textContent = time;
-
-        setTimeout(showTime, 1000);
-    }
-
-    </script>
-
+    @livewireScripts
+    
     @stack('after-scripts')
+    <!-- / Scripts -->
+
 </body>
+
 </html>

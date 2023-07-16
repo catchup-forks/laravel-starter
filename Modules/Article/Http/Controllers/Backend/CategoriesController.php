@@ -4,20 +4,28 @@ namespace Modules\Article\Http\Controllers\Backend;
 
 use App\Authorizable;
 use App\Http\Controllers\Controller;
-use Auth;
 use Carbon\Carbon;
 use Flash;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Log;
 use Modules\Article\Http\Requests\Backend\CategoriesRequest;
 use Yajra\DataTables\DataTables;
 
 class CategoriesController extends Controller
 {
     use Authorizable;
+
+    public $module_title;
+
+    public $module_name;
+
+    public $module_path;
+
+    public $module_icon;
+
+    public $module_model;
 
     public function __construct()
     {
@@ -53,7 +61,7 @@ class CategoriesController extends Controller
 
         $module_action = 'List';
 
-        $$module_name = $module_model::paginate();
+        $$module_name = $module_model::latest()->paginate();
 
         Log::info(label_case($module_title.' '.$module_action).' | User:'.auth()->user()->name.'(ID:'.auth()->user()->id.')');
 
@@ -91,7 +99,7 @@ class CategoriesController extends Controller
 
         foreach ($query_data as $row) {
             $$module_name[] = [
-                'id'   => $row->id,
+                'id' => $row->id,
                 'text' => $row->name.' (Slug: '.$row->slug.')',
             ];
         }
@@ -115,26 +123,26 @@ class CategoriesController extends Controller
         $data = $$module_name;
 
         return Datatables::of($$module_name)
-                        ->addColumn('action', function ($data) {
-                            $module_name = $this->module_name;
+            ->addColumn('action', function ($data) {
+                $module_name = $this->module_name;
 
-                            return view('backend.includes.action_column', compact('module_name', 'data'));
-                        })
-                        ->editColumn('name', '<strong>{{$name}}</strong>')
-                        ->editColumn('updated_at', function ($data) {
-                            $module_name = $this->module_name;
+                return view('backend.includes.action_column', compact('module_name', 'data'));
+            })
+            ->editColumn('name', '<strong>{{$name}}</strong>')
+            ->editColumn('updated_at', function ($data) {
+                $module_name = $this->module_name;
 
-                            $diff = Carbon::now()->diffInHours($data->updated_at);
+                $diff = Carbon::now()->diffInHours($data->updated_at);
 
-                            if ($diff < 25) {
-                                return $data->updated_at->diffForHumans();
-                            } else {
-                                return $data->updated_at->toCookieString();
-                            }
-                        })
-                        ->rawColumns(['name', 'action'])
-                        ->orderColumns(['id'], '-:column $1')
-                        ->make(true);
+                if ($diff < 25) {
+                    return $data->updated_at->diffForHumans();
+                } else {
+                    return $data->updated_at->isoFormat('LLLL');
+                }
+            })
+            ->rawColumns(['name', 'action'])
+            ->orderColumns(['id'], '-:column $1')
+            ->make(true);
     }
 
     /**
@@ -164,8 +172,7 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     *
+     * @param  Request  $request
      * @return Response
      */
     public function store(CategoriesRequest $request)
@@ -191,8 +198,7 @@ class CategoriesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function show($id)
@@ -221,8 +227,7 @@ class CategoriesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function edit($id)
@@ -249,9 +254,8 @@ class CategoriesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int     $id
-     *
+     * @param  Request  $request
+     * @param  int  $id
      * @return Response
      */
     public function update(CategoriesRequest $request, $id)
@@ -279,8 +283,7 @@ class CategoriesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function destroy($id)
@@ -335,9 +338,8 @@ class CategoriesController extends Controller
     /**
      * Restore a soft deleted entry.
      *
-     * @param Request $request
-     * @param int     $id
-     *
+     * @param  Request  $request
+     * @param  int  $id
      * @return Response
      */
     public function restore($id)

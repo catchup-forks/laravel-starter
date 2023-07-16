@@ -3,22 +3,25 @@
 namespace App\Models;
 
 use App\Models\Presenters\UserPresenter;
-use App\Notifications\ResetPasswordNotification;
+use App\Models\Traits\HasHashedMediaTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\MediaLibrary\HasMedia\HasMedia;
-use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Illuminate\Support\Facades\Auth;
+use Spatie\MediaLibrary\HasMedia;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements HasMedia, MustVerifyEmail
 {
+    use HasFactory;
+    use HasHashedMediaTrait;
     use HasRoles;
     use Notifiable;
     use SoftDeletes;
-    use HasMediaTrait;
     use UserPresenter;
+
     protected $guarded = [
         'id',
         'updated_at',
@@ -27,10 +30,10 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
         'password_confirmation',
     ];
 
-    protected $dates = [
-        'deleted_at',
-        'date_of_birth',
-        'email_verified_at',
+    protected $casts = [
+        'deleted_at' => 'datetime',
+        'date_of_birth' => 'datetime',
+        'email_verified_at' => 'datetime',
     ];
 
     /**
@@ -41,6 +44,32 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        // create a event to happen on creating
+        static::creating(function ($table) {
+            $table->created_by = Auth::id();
+        });
+
+        // create a event to happen on updating
+        static::updating(function ($table) {
+            $table->updated_by = Auth::id();
+        });
+
+        // create a event to happen on saving
+        static::saving(function ($table) {
+            $table->updated_by = Auth::id();
+        });
+
+        // create a event to happen on deleting
+        static::deleting(function ($table) {
+            $table->deleted_by = Auth::id();
+            $table->save();
+        });
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -67,18 +96,6 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     }
 
     /**
-     * Send the password reset notification.
-     *
-     * @param string $token
-     *
-     * @return void
-     */
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new ResetPasswordNotification($token));
-    }
-
-    /**
      * Get the list of users related to the current User.
      *
      * @return [array] roels
@@ -91,8 +108,7 @@ class User extends Authenticatable implements HasMedia, MustVerifyEmail
     /**
      * Route notifications for the Slack channel.
      *
-     * @param \Illuminate\Notifications\Notification $notification
-     *
+     * @param  \Illuminate\Notifications\Notification  $notification
      * @return string
      */
     public function routeNotificationForSlack($notification)

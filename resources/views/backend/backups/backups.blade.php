@@ -1,35 +1,31 @@
 @extends('backend.layouts.app')
 
-@section('title')
-{{ $module_action }} {{ $module_title }} | {{ app_name() }}
-@stop
+@section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item active"><i class="{{ $module_icon }}"></i> {{ $module_title }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item route='{{route("backend.$module_name.index")}}' icon='{{ $module_icon }}'>
+        {{ __($module_title) }}
+    </x-backend-breadcrumb-item>
+    <x-backend-breadcrumb-item type="active">{{ __($module_action) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
 <div class="card">
     <div class="card-body">
-        <div class="row">
-            <div class="col-8">
+        <div class="d-flex justify-content-between">
+            <div>
                 <h4 class="card-title mb-0">
-                    <i class="{{ $module_icon }}"></i> {{ $module_title }} <small class="text-muted">{{ $module_action }}</small>
+                    <i class="{{ $module_icon }}"></i> {{ __($module_title) }}
+                    <small class="text-muted">{{ __($module_action) }}</small>
                 </h4>
-                <div class="small text-muted">
-                    {{ Str::title($module_name) }} Management Dashboard
-                </div>
+                <div class="small text-medium-emphasis">@lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])</div>
             </div>
-            <!--/.col-->
-            <div class="col-4">
-                <div class="float-right">
-                    <a href="{{ route("backend.$module_name.create") }}" class="btn btn-success m-1 btn-sm" data-toggle="tooltip" title="Create New"><i class="fas fa-plus-circle"></i> Create New Backup</a>
-                </div>
+            <div class="btn-toolbar d-block" role="toolbar" aria-label="Toolbar with buttons">
+                <a href="{{ route("backend.$module_name.create") }}" class="btn btn-outline-success m-1" data-toggle="tooltip" title="Create New"><i class="fas fa-plus-circle"></i> @lang("Create new :module_name", ['module_name'=>Str::title($module_name)])</a>
             </div>
-            <!--/.col-->
         </div>
-        <!--/.row-->
 
         <div class="row mt-4">
             <div class="col">
@@ -42,19 +38,19 @@
                                 #
                             </th>
                             <th>
-                                File
+                                @lang('File')
                             </th>
                             <th>
-                                Size
+                                @lang('Size')
                             </th>
                             <th>
-                                Date
+                                @lang('Date')
                             </th>
                             <th>
-                                Age
+                                @lang('Age')
                             </th>
-                            <th class="text-right">
-                                Action
+                            <th class="text-end">
+                                @lang('Action')
                             </th>
                         </tr>
                     </thead>
@@ -77,10 +73,10 @@
                             <td>
                                 {{ $backup['date_ago'] }}
                             </td>
-                            <td class="text-right">
-                                <a href="{{ route("backend.$module_name.download", $backup['file_name']) }}" class="btn btn-primary m-1 btn-sm" data-toggle="tooltip" title="Download Backup File"><i class="fas fa-cloud-download-alt"></i> Download</a>
+                            <td class="text-end">
+                                <a href="{{ route("backend.$module_name.download", $backup['file_name']) }}" class="btn btn-primary m-1 btn-sm" data-toggle="tooltip" title="@lang('Download File')"><i class="fas fa-cloud-download-alt"></i>&nbsp;@lang('Download')</a>
 
-                                <a href="{{ route("backend.$module_name.delete", $backup['file_name']) }}" class="btn btn-danger m-1 btn-sm" data-toggle="tooltip" title="Delete Backup File"><i class="fas fa-trash"></i> Delete</a>
+                                <a href="{{ route("backend.$module_name.delete", $backup['file_name']) }}" class="btn btn-danger m-1 btn-sm" data-toggle="tooltip" title="@lang('Delete File')"><i class="fas fa-trash"></i>&nbsp;@lang('Delete')</a>
 
                             </td>
                         </tr>
@@ -88,13 +84,13 @@
                     </tbody>
                 </table>
                 @else
-                    <div class="text-center">
-                        <h4>There are no backups</h4>
-                    </div>
+                <div class="text-center">
+                    <h4>@lang('There are no backups')</h4>
+                </div>
                 @endif
 
             </div>
         </div>
     </div>
 </div>
-@stop
+@endsection

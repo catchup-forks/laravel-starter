@@ -1,301 +1,114 @@
 @extends('frontend.layouts.app')
 
-@section('title')
-{{$$module_name_singular->name}}
-@stop
-
+@section('title') {{$$module_name_singular->name}} @endsection
 
 @section('content')
-<div class="page-header page-header-small">
 
-    <div class="page-header-image" data-parallax="true" style="background-image:url('{{asset($$module_name_singular->featured_image)}}');">
-    </div>
-    <div class="content-center">
-        <div class="container">
-            <h1 class="title">
+<section class="bg-gray-100 text-gray-600 body-font px-20">
+    <div class="container mx-auto flex px-5 py-8 sm:py-16 md:flex-row flex-col items-center">
+        <div class="lg:flex-grow sm:w-4/12 lg:pr-24 md:pr-16 flex flex-col md:items-start md:text-left mb-16 md:mb-0 items-center text-center">
+            <h1 class="sm:text-4xl text-3xl mb-4 font-medium text-gray-800">
                 {{$$module_name_singular->name}}
-                <br>
-                <small>{{isset($$module_name_singular->created_by_alias)? $$module_name_singular->created_by_alias : $$module_name_singular->created_by_name}}</small>
             </h1>
+            @if($$module_name_singular->intro != "")
+            <p class="mb-8 leading-relaxed">
+                {{$$module_name_singular->intro}}
+            </p>
+            @endif
 
-            @include('flash::message')
-
-            <!-- Errors block -->
-            @include('frontend.includes.errors')
-            <!-- / Errors block -->
-
-            <div class="text-center">
-
-                <button class="btn btn-primary btn-icon btn-round" data-sharer="facebook" data-hashtag="MuktoLibrary" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Facebook" data-original-title="Share on Facebook"><i class="fab fa-facebook-square"></i></button>
-
-                <button class="btn btn-primary btn-icon btn-round" data-sharer="twitter" data-via="MuktoLibrary" data-title="{{$$module_name_singular->name}}" data-hashtags="MuktoLibrary" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Twitter" data-original-title="Share on Twitter"><i class="fab fa-twitter"></i></button>
-
-                <button class="btn btn-primary btn-icon btn-round" data-sharer="whatsapp" data-title="{{$$module_name_singular->name}}" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Whatsapp" data-original-title="Share on Whatsapp" data-web=""><i class="fab fa-whatsapp"></i></button>
-
-            </div>
+            @include('frontend.includes.messages')
+        </div>
+        <div class="sm:w-8/12">
+            <img class="object-cover object-center rounded shadow-md" alt="{{$$module_name_singular->name}}" src="{{$$module_name_singular->featured_image}}">
         </div>
     </div>
-</div>
+</section>
 
+<section class="py-10 px-20">
+    <div class="container mx-auto flex px-5 py-10 md:flex-row flex-col">
+        <div class="flex flex-col lg:flex-grow sm:w-8/12 sm:pr-8">
+            <div class="pb-5">
+                <p>
+                    {!!$$module_name_singular->content!!}
+                </p>
+            </div>
 
-<div class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    @php
-                    $post_details_url = route('frontend.posts.show',[encode_id($$module_name_singular->id), $$module_name_singular->slug]);
-                    @endphp
-                    <img class="card-img-top" src="{{$$module_name_singular->featured_image}}" alt="{{$$module_name_singular->name}}">
-                    <div class="card-body">
-                        <a href="{{$post_details_url}}">
-                            <h4 class="card-title">{{$$module_name_singular->name}}</h4>
-                        </a>
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            {!!isset($$module_name_singular->created_by_alias)? $$module_name_singular->created_by_alias : '<a href="'.route('frontend.users.profile', $$module_name_singular->created_by).'">'.$$module_name_singular->created_by_name.'</a>'!!}
-                        </h6>
-                        <hr>
-                        <p class="card-text">
-                            {!!$$module_name_singular->content!!}
-                        </p>
-                        <hr>
+            <hr>
 
-                        <p class="card-text">
-                            <a href="{{route('frontend.categories.show', [encode_id($$module_name_singular->category_id), $$module_name_singular->category->slug])}}" class="badge badge-primary">{{$$module_name_singular->category_name}}</a>
-                        </p>
-
-                        <p class="card-text">
-                            @foreach ($$module_name_singular->tags as $tag)
-                            <a href="{{route('frontend.tags.show', [encode_id($tag->id), $tag->slug])}}" class="badge badge-warning">{{$tag->name}}</a>
-                            @endforeach
-                        </p>
-
-                        <p class="card-text">
-                            <div class="row">
-                                <div class="col">
-                                    <div class="text-center">
-
-                                        <button class="btn btn-primary btn-icon btn-round" data-sharer="facebook" data-hashtag="MuktoLibrary" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Facebook" data-original-title="Share on Facebook"><i class="fab fa-facebook-square"></i></button>
-
-                                        <button class="btn btn-primary btn-icon btn-round" data-sharer="twitter" data-via="MuktoLibrary" data-title="{{$$module_name_singular->name}}" data-hashtags="MuktoLibrary" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Twitter" data-original-title="Share on Twitter"><i class="fab fa-twitter"></i></button>
-
-                                        <button class="btn btn-primary btn-icon btn-round" data-sharer="whatsapp" data-title="{{$$module_name_singular->name}}" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Whatsapp" data-original-title="Share on Whatsapp" data-web=""><i class="fab fa-whatsapp"></i></button>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </p>
-
-                        <p class="card-text">
-                            Comments (Total {{$$module_name_singular->comments->count()}})
-                            <br>
-                            <?php
-                            $comments_all = $$module_name_singular->comments;
-                            $comments_level1 = $comments_all->where('parent_id','');
-                            ?>
-                            @foreach ($comments_level1 as $comment)
-                            <blockquote>
-                                <div class="blockquote blockquote-primary">
-                                    <a href="{{route('frontend.comments.show', encode_id($comment->id))}}">
-                                        <!-- <i class="now-ui-icons ui-2_chat-round"></i> -->
-                                        <i class="far fa-comment-alt"></i>
-                                    </a>
-                                    {{$comment->name}}
-                                    <br>
-
-                                    {!!$comment->comment!!}
-
-                                    <!-- <br>
-                                    <br> -->
-
-                                    <small>
-                                        - {{$comment->user_name}}
-                                    </small>
-
-                                    @guest
-                                    <a href="{{route('frontend.auth.login')}}?redirectTo={{url()->current()}}" class="btn btn-primary btn-sm float-right m-0"><i class="fas fa-user-shield"></i> Login & Reply</a>
-                                    @endguest
-
-                                    @auth
-                                    <button type="button" id="replyBtn{{encode_id($comment->id)}}" class="btn btn-primary btn-sm float-right m-0" data-toggle="collapse" href="#replyForm{{encode_id($comment->id)}}" role="button" aria-expanded="false" aria-controls="replyForm{{encode_id($comment->id)}}">Reply</button>
-                                    @endauth
-
-                                    <?php
-                                    $comments_of_comment = $comments_all->where('parent_id', $comment->id);
-                                    ?>
-                                    @if ($comments_of_comment)
-                                    <hr>
-                                    <strong>Replies</strong>
-                                    <ul>
-                                        @foreach ($comments_of_comment as $comment_reply)
-                                        <li>
-                                            {!!$comment_reply->comment!!} - {{$comment->user_name}}
-                                        </li>
-                                        @endforeach
-                                    </ul>
-                                    @endif
-                                </div>
-                                @auth
-                                <div class="collapse multi-collapse" id="replyForm{{encode_id($comment->id)}}">
-                                    <p>
-                                        {{ html()->form('POST', route("frontend.comments.store"))->class('form')->open() }}
-
-                                        <?php
-                                        $field_name = 'parent_id';
-                                        $field_lable = label_case($field_name);
-                                        $field_placeholder = $field_lable;
-                                        $required = "required";
-                                        ?>
-                                        {{ html()->hidden($field_name)->value(encode_id($comment->id))->attributes(["$required"]) }}
-
-                                        <?php
-                                        $field_name = 'post_id';
-                                        $field_lable = label_case($field_name);
-                                        $field_placeholder = $field_lable;
-                                        $required = "required";
-                                        ?>
-                                        {{ html()->hidden($field_name)->value(encode_id($$module_name_singular->id))->attributes(["$required"]) }}
-
-                                        <?php
-                                        $field_name = 'user_id';
-                                        $field_lable = label_case($field_name);
-                                        $field_placeholder = $field_lable;
-                                        $required = "required";
-                                        ?>
-                                        {{ html()->hidden($field_name)->value(encode_id(auth()->user()->id))->attributes(["$required"]) }}
-
-                                        <?php
-                                        $field_name = 'name';
-                                        $field_lable = label_case($field_name);
-                                        $field_placeholder = $field_lable;
-                                        $required = "required";
-                                        ?>
-                                        {{ html()->hidden($field_name)->value("Reply of ".$comment->name)->attributes(["$required"]) }}
-
-                                        <div class="row">
-                                            <div class="col-1">
-                                                &nbsp;
-                                            </div>
-                                            <div class="col-8">
-                                                <div class="form-group">
-                                                    <?php
-                                                    $field_name = 'comment';
-                                                    $field_lable = "Reply";
-                                                    $field_placeholder = $field_lable;
-                                                    $required = "required";
-                                                    ?>
-                                                    <!-- {{ html()->label($field_lable, $field_name) }} {!! fielf_required($required) !!} -->
-                                                    {{ html()->text($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
-                                                </div>
-                                            </div>
-
-                                            <div class="col-2">
-                                                <div class="form-group">
-                                                    {{ html()->button($text = "<i class='fas fa-save'></i> Submit", $type = 'submit')->class('btn btn-success m-0') }}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{ html()->form()->close() }}
-                                    </p>
-                                </div>
-                                @endauth
-
-                            </blockquote>
-                            @endforeach
-                        </p>
-                        <div class="row justify-content-md-center">
-                            @auth
-                            <div class="col-4 align-self-center">
-                                <p>
-                                    <a class="btn btn-primary btn-lg btn-block" data-toggle="collapse" href="#commentForm" role="button" aria-expanded="false" aria-controls="commentForm"><i class="far fa-comment-alt"></i> Write new comment</a>
-                                </p>
-                            </div>
-                            <div class="row justify-content-md-center">
-                                <div class="col-12 col-sm-8 align-self-center">
-                                    <div class="collapse multi-collapse" id="commentForm">
-                                        <div class="card card-body">
-                                            <p>
-                                                Your comment will be in the moderation queue. If your comment will be approved, you will get notification and it will be displayed here.
-                                                <br>
-                                                Please submit once & wait till published.
-                                            </p>
-
-                                            {{ html()->form('POST', route("frontend.comments.store"))->class('form')->open() }}
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="form-group">
-                                                        <?php
-                                                        $field_name = 'name';
-                                                        $field_lable = "Subject";
-                                                        $field_placeholder = $field_lable;
-                                                        $required = "required";
-                                                        ?>
-                                                        {{ html()->label($field_lable, $field_name) }} {!! fielf_required($required) !!}
-                                                        {{ html()->text($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
-                                                    </div>
-                                                </div>
-                                                <div class="col-12">
-                                                    <div class="form-group">
-                                                        <?php
-                                                        $field_name = 'comment';
-                                                        $field_lable = "Details Comment";
-                                                        $field_placeholder = $field_lable;
-                                                        $required = "required";
-                                                        ?>
-                                                        {{ html()->label($field_lable, $field_name) }} {!! fielf_required($required) !!}
-                                                        {{ html()->textarea($field_name)->placeholder($field_placeholder)->class('form-control')->attributes(["$required"]) }}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <?php
-                                            $field_name = 'post_id';
-                                            $field_lable = label_case($field_name);
-                                            $field_placeholder = $field_lable;
-                                            $required = "required";
-                                            ?>
-                                            {{ html()->hidden($field_name)->value(encode_id($$module_name_singular->id))->attributes(["$required"]) }}
-
-                                            <?php
-                                            $field_name = 'user_id';
-                                            $field_lable = label_case($field_name);
-                                            $field_placeholder = $field_lable;
-                                            $required = "required";
-                                            ?>
-                                            {{ html()->hidden($field_name)->value(encode_id(auth()->user()->id))->attributes(["$required"]) }}
-
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    <div class="form-group">
-                                                        {{ html()->button($text = "<i class='fas fa-save'></i> Submit", $type = 'submit')->class('btn btn-success') }}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{ html()->form()->close() }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endauth
-                            @guest
-                            <div class="col-12 col-sm-4 align-self-center">
-                                <p>
-                                    <a href="{{route('frontend.auth.login')}}?redirectTo={{url()->current()}}" class="btn btn-primary btn-lg btn-block"><i class="fas fa-user-shield"></i> Login & Write new comment</a>
-                                </p>
-                            </div>
-                            @endguest
-                        </div>
-
-                        <p class="card-text">
-                            <small class="text-muted">{{$$module_name_singular->published_at_formatted}}</small>
-                        </p>
+            <div class="py-5">
+                <div class="flex justify-between font-bold">
+                    <div>
+                        {{__('Written by')}}: {{isset($$module_name_singular->created_by_alias)? $$module_name_singular->created_by_alias : $$module_name_singular->created_by_name}}
+                    </div>
+                    <div>
+                        {{__('Published at')}}: {{$$module_name_singular->published_at->isoFormat('llll')}}
                     </div>
                 </div>
             </div>
+
+            <div class="flex flex-row justify-between content-center items-center py-5">
+                <p>
+                    <span class="font-weight-bold">
+                        @lang('Category'):
+                    </span>
+
+                    <a href="{{route('frontend.categories.show', [encode_id($$module_name_singular->category_id), $$module_name_singular->category->slug])}}" class="m-2 p-2 bg-gray-100 rounded border-transparent border hover:border-gray-800 transition ease-out duration-300">{{$$module_name_singular->category_name}}</a>
+                </p>
+
+                @if (count($$module_name_singular->tags))
+                <p>
+                    <span class="font-weight-bold">
+                        @lang('Tags'):
+                    </span>
+
+                    @foreach ($$module_name_singular->tags as $tag)
+                    <a href="{{route('frontend.tags.show', [encode_id($tag->id), $tag->slug])}}" class="m-2 p-2 bg-gray-100 rounded border-transparent border hover:border-gray-800 transition ease-out duration-300">{{$tag->name}}</a>
+                    @endforeach
+                </p>
+                @endif
+            </div>
+
+            <div class="py-5">
+                <div class="flex flex-row justify-around content-center items-center ">
+                    <h6 class="">Share with others</h6>
+
+                    <div>
+                        @php $title_text = $$module_name_singular->name; @endphp
+
+                        <button data-title='Share on Twitter' data-placement="top" class="tooltip p-2 m-2 hover:shadow-lg transition ease-out duration-300 border border-gray-400 hover:border-gray-600 hover:bg-gray-100 rounded-sm" data-sharer="twitter" data-via="muktolibrary" data-title="{{$title_text}}" data-hashtags="muktolibrary" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Twitter" data-original-title="Share on Twitter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-twitter" viewBox="0 0 16 16">
+                                <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z" />
+                            </svg>
+                        </button>
+
+                        <button data-title='Share on Facebook' data-placement="top" class="tooltip p-2 m-2 hover:shadow-lg transition ease-out duration-300 border border-gray-400 hover:border-gray-600 hover:bg-gray-100 rounded-sm" data-sharer="facebook" data-hashtag="muktolibrary" data-url="{{url()->full()}}" data-toggle="tooltip" title="Share on Facebook" data-original-title="Share on Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-facebook" viewBox="0 0 16 16">
+                                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-5">
+                @include('article::frontend.posts.blocks.comments')
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:w-4/12">
+            <div class="py-5 sm:pt-0">
+                <livewire:recent-posts />
+            </div>
         </div>
     </div>
-</div>
+</section>
 
 @endsection
+
+@push ("after-style")
+
+@endpush
+
+@push ("after-scripts")
+<script type="module" src="https://cdn.jsdelivr.net/npm/sharer.js@latest/sharer.min.js"></script>
+@endpush

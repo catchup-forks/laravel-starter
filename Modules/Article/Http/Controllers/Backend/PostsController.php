@@ -4,13 +4,12 @@ namespace Modules\Article\Http\Controllers\Backend;
 
 use App\Authorizable;
 use App\Http\Controllers\Controller;
-use Auth;
 use Carbon\Carbon;
 use Flash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Log;
 use Modules\Article\Entities\Category;
 use Modules\Article\Events\PostCreated;
 use Modules\Article\Events\PostUpdated;
@@ -21,6 +20,16 @@ use Yajra\DataTables\DataTables;
 class PostsController extends Controller
 {
     use Authorizable;
+
+    public $module_title;
+
+    public $module_name;
+
+    public $module_path;
+
+    public $module_icon;
+
+    public $module_model;
 
     public function __construct()
     {
@@ -56,7 +65,7 @@ class PostsController extends Controller
 
         $module_action = 'List';
 
-        $$module_name = $module_model::paginate();
+        $$module_name = $module_model::latest()->paginate();
 
         Log::info(label_case($module_title.' '.$module_action).' | User:'.Auth::user()->name.'(ID:'.Auth::user()->id.')');
 
@@ -82,30 +91,30 @@ class PostsController extends Controller
         $data = $$module_name;
 
         return Datatables::of($$module_name)
-                        ->addColumn('action', function ($data) {
-                            $module_name = $this->module_name;
+            ->addColumn('action', function ($data) {
+                $module_name = $this->module_name;
 
-                            return view('backend.includes.action_column', compact('module_name', 'data'));
-                        })
-                        ->editColumn('name', function ($data) {
-                            $is_featured = ($data->is_featured) ? '<span class="badge badge-primary">Featured</span>' : '';
+                return view('backend.includes.action_column', compact('module_name', 'data'));
+            })
+            ->editColumn('name', function ($data) {
+                $is_featured = ($data->is_featured) ? '<span class="badge bg-primary">Featured</span>' : '';
 
-                            return $data->name.' '.$data->status_formatted.' '.$is_featured;
-                        })
-                        ->editColumn('updated_at', function ($data) {
-                            $module_name = $this->module_name;
+                return $data->name.' '.$data->status_formatted.' '.$is_featured;
+            })
+            ->editColumn('updated_at', function ($data) {
+                $module_name = $this->module_name;
 
-                            $diff = Carbon::now()->diffInHours($data->updated_at);
+                $diff = Carbon::now()->diffInHours($data->updated_at);
 
-                            if ($diff < 25) {
-                                return $data->updated_at->diffForHumans();
-                            } else {
-                                return $data->updated_at->toCookieString();
-                            }
-                        })
-                        ->rawColumns(['name', 'status', 'action'])
-                        ->orderColumns(['id'], '-:column $1')
-                        ->make(true);
+                if ($diff < 25) {
+                    return $data->updated_at->diffForHumans();
+                } else {
+                    return $data->updated_at->isoFormat('LLLL');
+                }
+            })
+            ->rawColumns(['name', 'status', 'action'])
+            ->orderColumns(['id'], '-:column $1')
+            ->make(true);
     }
 
     /**
@@ -136,7 +145,7 @@ class PostsController extends Controller
 
         foreach ($query_data as $row) {
             $$module_name[] = [
-                'id'   => $row->id,
+                'id' => $row->id,
                 'text' => $row->name,
             ];
         }
@@ -173,8 +182,7 @@ class PostsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     *
+     * @param  Request  $request
      * @return Response
      */
     public function store(PostsRequest $request)
@@ -206,8 +214,7 @@ class PostsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function show($id)
@@ -224,10 +231,10 @@ class PostsController extends Controller
         $$module_name_singular = $module_model::findOrFail($id);
 
         $activities = Activity::where('subject_type', '=', $module_model)
-                                ->where('log_name', '=', $module_name)
-                                ->where('subject_id', '=', $id)
-                                ->latest()
-                                ->paginate();
+            ->where('log_name', '=', $module_name)
+            ->where('subject_id', '=', $id)
+            ->latest()
+            ->paginate();
 
         Log::info(label_case($module_title.' '.$module_action).' | User:'.Auth::user()->name.'(ID:'.Auth::user()->id.')');
 
@@ -240,8 +247,7 @@ class PostsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function edit($id)
@@ -270,9 +276,8 @@ class PostsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param int     $id
-     *
+     * @param  Request  $request
+     * @param  int  $id
      * @return Response
      */
     public function update(PostsRequest $request, $id)
@@ -309,8 +314,7 @@ class PostsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function destroy($id)
@@ -365,9 +369,8 @@ class PostsController extends Controller
     /**
      * Restore a soft deleted entry.
      *
-     * @param Request $request
-     * @param int     $id
-     *
+     * @param  Request  $request
+     * @param  int  $id
      * @return Response
      */
     public function restore($id)

@@ -1,36 +1,29 @@
 @extends('backend.layouts.app')
 
-@section('title')
-{{ $module_action }} {{ $module_title }} | {{ app_name() }}
-@stop
+@section('title') {{ __($module_action) }} {{ __($module_title) }} @endsection
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item active"><i class="{{ $module_icon }}"></i> {{ $module_title }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item type="active" icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
-<div class="card">
+<div class="card mb-4">
     <div class="card-body">
-        <div class="row">
-            <div class="col">
-                <h4 class="card-title mb-0">
-                    <i class="{{ $module_icon }}"></i> {{ $module_title }} ({{$unread_notifications_count}} unread)
-                    <small class="text-muted">{{ $module_action }}</small>
-                </h4>
-                <div class="small text-muted">
-                    {{ ucwords($module_name) }} Management Dashboard
-                </div>
-            </div>
-            <!--/.col-->
-            <div class="col-4">
-                <div class="float-right">
-                    <a href="{{ route("backend.$module_name.markAllAsRead") }}" class="btn btn-success mt-1 btn-sm" data-toggle="tooltip" title="Notifications Mark All As Read"><i class="fas fa-check-square"></i> Mark All As Read</a>
-                </div>
-            </div>
-            <!--/.col-->
-        </div>
-        <!--/.row-->
+        <x-backend.section-header>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }}
+            (@lang(":count unread", ['count'=>$unread_notifications_count]))
+            <small class="text-muted">{{ __($module_action) }}</small>
+
+            <x-slot name="subtitle">
+                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+            </x-slot>
+            <x-slot name="toolbar">
+                <a href="{{ route("backend.$module_name.markAllAsRead") }}" class="btn btn-outline-success mb-1" data-toggle="tooltip" title="@lang('Mark all as read')"><i class="fas fa-check-square"></i> @lang('Mark all as read')</a>
+                <a href="{{route("backend.$module_name.deleteAll")}}" class="btn btn-outline-danger mb-1" data-method="DELETE" data-token="{{csrf_token()}}" data-toggle="tooltip" title="@lang('Delete all notifications')"><i class="fas fa-trash-alt"></i></a>
+            </x-slot>
+        </x-backend.section-header>
 
         <div class="row mt-4">
             <div class="col">
@@ -38,16 +31,16 @@
                     <thead>
                         <tr>
                             <th>
-                                Text
+                                @lang('Text')
                             </th>
                             <th>
-                                Module
+                                @lang('Module')
                             </th>
                             <th>
-                                Updated At
+                                @lang('Updated At')
                             </th>
-                            <th class="text-right">
-                                Action
+                            <th class="text-end">
+                                @lang('Action')
                             </th>
                         </tr>
                     </thead>
@@ -76,8 +69,8 @@
                             <td>
                                 {{ $module_name_singular->updated_at->diffForHumans() }}
                             </td>
-                            <td class="text-right">
-                                <a href='{!!route("backend.$module_name.show", $module_name_singular)!!}' class='btn btn-sm btn-success mt-1' data-toggle="tooltip" title="Show {{ ucwords(Str::singular($module_name)) }}"><i class="fas fa-tv"></i></a>
+                            <td class="text-end">
+                                <a href='{!!route("backend.$module_name.show", $module_name_singular)!!}' class='btn btn-sm btn-success mt-1' data-toggle="tooltip" title="@lang('Show') {{ ucwords(Str::singular($module_name)) }}"><i class="fas fa-tv"></i></a>
                             </td>
                         </tr>
                         @endforeach
@@ -90,15 +83,15 @@
         <div class="row">
             <div class="col-7">
                 <div class="float-left">
-                    Total {{ $$module_name->total() }} {{ ucwords($module_name) }}
+                    @lang('Total') {{ $$module_name->total() }} {{ ucwords($module_name) }}
                 </div>
             </div>
             <div class="col-5">
-                <div class="float-right">
+                <div class="float-end">
                     {!! $$module_name->render() !!}
                 </div>
             </div>
         </div>
     </div>
 </div>
-@stop
+@endsection

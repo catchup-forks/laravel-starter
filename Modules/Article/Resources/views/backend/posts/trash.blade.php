@@ -3,31 +3,26 @@
 @section ('title', ucfirst($module_name) . ' ' . ucfirst($module_action))
 
 @section('breadcrumbs')
-<li class="breadcrumb-item"><a href="{!!route('backend.dashboard')!!}"><i class="icon-speedometer"></i> Dashboard</a></li>
-<li class="breadcrumb-item active"><i class="{{ $module_icon }}"></i> {{ $module_title }}</li>
-@stop
+<x-backend-breadcrumbs>
+    <x-backend-breadcrumb-item type="active" icon='{{ $module_icon }}'>{{ __($module_title) }}</x-backend-breadcrumb-item>
+</x-backend-breadcrumbs>
+@endsection
 
 @section('content')
 <div class="card">
     <div class="card-body">
-        <div class="row">
-            <div class="col-8">
-                <h4 class="card-title mb-0">
-                    <i class="{{ $module_icon }}"></i> {{ $module_title }} <small class="text-muted">{{ $module_action }}</small>
-                </h4>
-                <div class="small text-muted">
-                    {{ ucwords($module_name) }} Management Dashboard
-                </div>
-            </div>
-            <!--/.col-->
-            <div class="col-4">
-                <div class="float-right">
-                    <a href="{{ route("backend.$module_name.index") }}" class="btn btn-secondary mt-1 btn-sm" data-toggle="tooltip" title="{{ ucwords($module_name) }} List"><i class="fas fa-list"></i> List</a>
-                </div>
-            </div>
-            <!--/.col-->
-        </div>
-        <!--/.row-->
+
+        <x-backend.section-header>
+            <i class="{{ $module_icon }}"></i> {{ __($module_title) }} <small class="text-muted">{{ __($module_action) }}</small>
+
+            <x-slot name="subtitle">
+                @lang(":module_name Management Dashboard", ['module_name'=>Str::title($module_name)])
+            </x-slot>
+            <x-slot name="toolbar">
+                <x-backend.buttons.return-back />
+                <a href='{{ route("backend.$module_name.index") }}' class="btn btn-secondary" data-toggle="tooltip" title="{{ ucwords($module_name) }} List"><i class="fas fa-list"></i> List</a>
+            </x-slot>
+        </x-backend.section-header>
 
         <div class="row mt-4">
             <div class="col">
@@ -49,7 +44,7 @@
                             <th>
                                 Created By
                             </th>
-                            <th class="text-right">
+                            <th class="text-end">
                                 Action
                             </th>
                         </tr>
@@ -73,7 +68,7 @@
                             <td>
                                 {{ $module_name_singular->created_by }}
                             </td>
-                            <td class="text-right">
+                            <td class="text-end">
                                 <a href="{{route("backend.$module_name.restore", $module_name_singular)}}" class="btn btn-warning btn-sm" data-method="PATCH" data-token="{{csrf_token()}}" data-toggle="tooltip" title="{{__('labels.backend.restore')}}"><i class='fas fa-undo'></i> {{__('labels.backend.restore')}}</a>
                             </td>
                         </tr>
@@ -91,7 +86,7 @@
                 </div>
             </div>
             <div class="col-5">
-                <div class="float-right">
+                <div class="float-end">
                     {!! $$module_name->render() !!}
                 </div>
             </div>
@@ -99,4 +94,4 @@
     </div>
 </div>
 
-@stop
+@endsection

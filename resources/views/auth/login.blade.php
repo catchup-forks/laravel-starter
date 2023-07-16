@@ -1,107 +1,68 @@
-@extends('auth.layout')
+<x-auth-layout>
+    <x-slot name="title">
+        @lang('Login')
+    </x-slot>
 
-@section('content')
+    <x-auth-card>
+        <x-slot name="logo">
+            <a href="/">
+                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+            </a>
+        </x-slot>
 
-<div class="page-header-image" style="background-image:url('{{asset('img/cover-01.jpg')}}')"></div>
+        <!-- Session Status -->
+        <x-auth-session-status class="mb-4" :status="session('status')" />
 
-<div class="content-center">
+        <!-- Social Login -->
+        <x-auth-social-login />
 
-    <div class="container">
+        <!-- Validation Errors -->
+        <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
-        <div class="col-md-4 content-center">
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-            <div class="card card-login card-plain">
-                <form class="form" method="POST" action="{{ route('login') }}">
-                    @csrf
+            <!-- Email Address -->
+            <div>
+                <x-label for="email" :value="__('Email')" />
 
-                    <div class="header header-primary text-center">
-                        <h5>
-                            Login to Account
-                        </h5>
-
-                        @include('flash::message')
-
-                        @if ($errors->any())
-                        <div class="row justify-content-center">
-                            <div class="col-12 align-self-center">
-                                <div class="alert alert-danger" role="alert">
-                                    <div class="container">
-                                        <div class="alert-icon">
-                                            <i class="fas fa-bolt"></i>
-                                        </div>
-                                        <p>
-                                            <i class="fa fa-exclamation-triangle"></i> Please fix the following errors and submit again!
-                                        </p>
-                                        <ul>
-                                            @foreach ($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                            @endforeach
-                                        </ul>
-
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">
-                                                <i class="now-ui-icons ui-1_simple-remove"></i>
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-                    <div class="content">
-                        <div class="form-check">
-                            <input type="hidden" name="redirectTo" value="{{request('redirectTo')}}">
-                            <div class="input-group mb-3 input-lg">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="input-email"><i class="now-ui-icons users_single-02"></i></span>
-                                </div>
-                                <input id="email" type="text" class="form-control" name="email" value="{{ old('email') }}" placeholder="{{ __('E-Mail Address') }}" aria-label="email" aria-describedby="input-email" required>
-                            </div>
-                        </div>
-
-                        <div class="form-check">
-                            <div class="input-group mb-3 input-lg">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text" id="input-password"><i class="now-ui-icons objects_key-25"></i></span>
-                                </div>
-                                <input id="password" type="password" class="form-control" name="password" placeholder="Password" aria-label="Password" aria-describedby="input-password" required>
-                            </div>
-                        </div>
-
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                                <span class="form-check-sign"></span>
-                                Remember my login
-                            </label>
-                        </div>
-                        <div class="footer text-center">
-                            <button type="submit" class="btn btn-primary btn-round btn-block">Submit</button>
-                        </div>
-                    </div>
-
-                    @if (Route::has('register'))
-                    <div class="pull-left">
-                        <h6>
-                            <a href="{{ route('register') }}" class="link">Create Account</a>
-                        </h6>
-                    </div>
-                    @endif
-                    @if (Route::has('password.request'))
-                        <div class="float-right">
-                            <h6>
-                                <a class="link" href="{{ route('password.request') }}">
-                                    {{ __('Forgot Your Password?') }}
-                                </a>
-                            </h6>
-                        </div>
-                    @endif
-
-                </form>
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
             </div>
-        </div>
-    </div>
-</div>
 
-@endsection
+            <!-- Password -->
+            <div class="mt-4">
+                <x-label for="password" :value="__('Password')" />
+
+                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+            </div>
+
+            <!-- Remember Me -->
+            <div class="block mt-4">
+                <label for="remember_me" class="inline-flex items-center">
+                    <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
+                    <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-end mt-4">
+                @if (Route::has('password.request'))
+                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
+                    {{ __('Forgot your password?') }}
+                </a>
+                @endif
+
+                <x-button class="ml-3">
+                    {{ __('Log in') }}
+                </x-button>
+            </div>
+        </form>
+
+        <x-slot name="extra">
+            @if (Route::has('register'))
+            <p class="text-center text-gray-600 mt-4">
+                Do not have an account? <a href="{{ route('register') }}" class="underline hover:text-gray-900">Register</a>.
+            </p>
+            @endif
+        </x-slot>
+    </x-auth-card>
+</x-auth-layout>

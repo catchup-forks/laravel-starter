@@ -8,6 +8,16 @@ use Illuminate\Support\Str;
 
 class CategoriesController extends Controller
 {
+    public $module_title;
+
+    public $module_name;
+
+    public $module_path;
+
+    public $module_icon;
+
+    public $module_model;
+
     public function __construct()
     {
         // Page Title
@@ -53,8 +63,7 @@ class CategoriesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return Response
      */
     public function show($id)

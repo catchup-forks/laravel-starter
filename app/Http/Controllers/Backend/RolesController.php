@@ -6,14 +6,24 @@ use App\Authorizable;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
-use Flash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use Log;
+use Laracasts\Flash\Flash;
 
 class RolesController extends Controller
 {
     use Authorizable;
+
+    public $module_title;
+
+    public $module_name;
+
+    public $module_path;
+
+    public $module_icon;
+
+    public $module_model;
 
     public function __construct()
     {
@@ -27,7 +37,7 @@ class RolesController extends Controller
         $this->module_path = 'roles';
 
         // module icon
-        $this->module_icon = 'icon-user-following';
+        $this->module_icon = 'fa-solid fa-user-shield';
 
         // module model name, path
         $this->module_model = "App\Models\Role";
@@ -86,8 +96,6 @@ class RolesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     *
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -121,8 +129,7 @@ class RolesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -149,8 +156,7 @@ class RolesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -176,9 +182,7 @@ class RolesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int                      $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -195,7 +199,7 @@ class RolesController extends Controller
         $$module_name_singular = $module_model::findOrFail($id);
 
         $this->validate($request, [
-            'name'        => 'required|max:20|unique:roles,name,'.$id,
+            'name' => 'required|max:20|unique:roles,name,'.$id,
             'permissions' => 'required',
         ]);
 
@@ -222,8 +226,7 @@ class RolesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
